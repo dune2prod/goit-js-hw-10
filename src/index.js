@@ -37,47 +37,41 @@
 //   </li>`).join('')
 // }
 // Котики*********************************************************************************************
-// import ABC from "./cat-api.js";
-// import {a} from "./cat-api.js";
+import {fetchCatByBreed, fetchBreeds} from "./cat-api.js";
+
 
 
 const catSelector = document.querySelector('.breed-select');
 const catInfo = document.querySelector(".cat-info");
+
+
 catSelector.addEventListener('change', onInputSelect);
-
-const API_KEY = 'api_key=live_FmoyFNMFk66lp5FlkqDMo2DsUUF779eEfwbDSw2SDerzlMDn8v9p7wHPQp65RBcv';
-const BASE_URL = 'https://api.thecatapi.com/v1';
-
 function onInputSelect(event) {
-    console.log(event.target.value)
-    return fetch(`${BASE_URL}/images/search?breed_ids=${event.target.value}&${API_KEY}`)
-        .then(Response => {
-            if (!Response.ok) {
-            throw new Error(Response.statusText)
-            }
-           
-           return Response.json();
+    fetchCatByBreed(event)
+        .then((data) => {
+            // console.log(data[0].breeds[0]);
+            // console.log(data[0].breeds[0].name);
+            // console.log(data[0].breeds[0].description)
+            // console.log(data[0].breeds[0].temperament)
+            // console.log(data[0].url)
+            createCatCardMarkup(data)
         })
-        .then(data => console.log(data[0].breeds[0]))
-        
-    .catch((err) => console.log(err))
 };
 
-function fetchBreeds() {
-    
-    
-       return fetch(`${BASE_URL}/breeds?${API_KEY}`)
-        .then(Response => {
-            if (!Response.ok) {
-                throw new Error(Response.statusText)
-            }
-            
-           return Response.json()
+function createCatCardMarkup(data) {
+    const { name, description, temperament } = data[0].breeds[0];
+    const image = data[0].url;
+   
+        catInfo.innerHTML = `<div>
+        <h2>${name}</h2>
+        <img src="${image}" alt="Cat Pic" width = 500>
+        <p>${description}</p>
+        <p>${temperament}</p>
+</div>`
         
-        })
-           
-    .catch((err) => console.log(err))
-};
+
+    
+}
 
 function createCatlistMarkup(arr) {
     const markup = [];
@@ -88,6 +82,6 @@ function createCatlistMarkup(arr) {
        catSelector.innerHTML = markup.join()
 };
 
-
+// createCatCardMarkup()
 fetchBreeds()
 .then(data => createCatlistMarkup(data))
